@@ -7,7 +7,7 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_nucleo.h"
 #include "tn.h"
-#include "queue_example.h"
+//#include "queue_example.h"
 
 //-- system frequency
 #pragma clang diagnostic push
@@ -261,14 +261,7 @@ void task_b_body(void *par)
                 tn_task_sleep(50);
             }
         }
-//        JoyState = BSP_JOY_GetState();
-//        //        Blink_LED(JoyState);
-//        if(JoyState == JOY_LEFT)
-//        {
-//            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-//            tn_task_sleep(100);
-//            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-//        }
+
         HAL_Delay(6);
         tn_task_sleep(1000);
     }
@@ -409,6 +402,22 @@ void idle_task_callback (void)
 //}
 
 
+//-- create first application task(s)
+void init_task_create(void)
+{
+    //-- task A performs complete application initialization,
+    //   it's the first created application task
+    tn_task_create(
+            &task_a,                   //-- task structure
+            task_a_body,               //-- task body function
+            TASK_A_PRIORITY,           //-- task priority
+            task_a_stack,              //-- task stack
+            TASK_A_STK_SIZE,           //-- task stack size (in words)
+            NULL,                      //-- task function parameter
+            TN_TASK_CREATE_OPT_START   //-- creation option
+    );
+
+}
 
 int main(void)
 {

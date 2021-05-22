@@ -1,20 +1,18 @@
 cmake_minimum_required(VERSION 3.19)
-project(tneo_test C ASM)
+project(tneo-sfdq C ASM)
 set(CMAKE_C_STANDARD 11)
 add_subdirectory(sfdq_firmware)
 add_subdirectory(tneo)
-#add_subdirectory(Drivers/STM32F4xx_HAL_Driver)
+add_subdirectory(HAL_Drivers/STM32F4xx_HAL_Driver)
 add_subdirectory(lua-5.4.3)
 
-add_executable(tneo_test
+add_executable(${PROJECT_NAME}
 #        src/main.c
         src/sfdq-main.c
         src/os-tasks.c
         buddymem/emm.c
         fft-c/libfft/fft.c
         src/task_consumer.c
-#        src/task_producer.c
-#        HAL_Drivers/BSP/STM32F4xx-Nucleo/stm32f4xx_nucleo.c
         src/system_stm32f4xx.c
         src/startup_stm32f446xx.s
         )
@@ -32,10 +30,6 @@ target_include_directories(${PROJECT_NAME}
         sfdq_firmware/CMSIS/device
         sfdq_firmware/CMSIS/core
         sfdq_firmware/StdPeriph_Driver/inc
-#        Drivers/BSP/STM32F4xx-Nucleo/
-#        Drivers/CMSIS/Include
-#        Drivers/CMSIS/Device/ST/STM32F4xx/Include
-#        Drivers/STM32F4xx_HAL_Driver/Inc
         )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -68,7 +62,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         sfdq
         cmsis
         stm32StdPeriph
-#        STM32F4xx_HAL_Driver
         )
 # Only when cross-compiling, i.e. for hardware build
 target_link_options(${PROJECT_NAME} PRIVATE
@@ -82,6 +75,63 @@ target_link_options(${PROJECT_NAME} PRIVATE
         -Wl,--gc-sections
         )
 
+set(TN_HAL tneo-test)
+add_executable(${TN_HAL}
+        src/main.c
+        HAL_Drivers/BSP/STM32F4xx-Nucleo/stm32f4xx_nucleo.c
+        src/system_stm32f4xx.c
+        src/startup_stm32f446xx.s
+        )
+target_include_directories(${TN_HAL}
+        PUBLIC
+        inc/
+        tneo/src/
+        tneo/src/core
+        HAL_Drivers/BSP/STM32F4xx-Nucleo/
+        HAL_Drivers/CMSIS/Include
+        HAL_Drivers/CMSIS/Device/ST/STM32F4xx/Include
+        HAL_Drivers/STM32F4xx_HAL_Driver/Inc
+        )
+
+target_compile_definitions(${TN_HAL}
+        PUBLIC
+        STM32F446xx
+        STM32F446RETx
+        STM32F4
+        USE_FULL_ASSERT
+        USE_STDPERIPH_DRIVER
+        HSE_VALUE=20000000
+        )
+
+target_compile_options(${TN_HAL} PUBLIC
+        -Wno-unknown-pragmas # GCC doesn't like the pragmas used to turn off endless loop warnings in CLion.
+        -mcpu=cortex-m4
+        -mthumb
+        -mfloat-abi=hard
+        -mfpu=fpv4-sp-d16
+        -fdata-sections
+        -ffunction-sections
+        -Wall
+        -Os
+        -g
+        )
+
+
+target_link_libraries(${TN_HAL} PUBLIC
+        tneo
+        STM32F4xx_HAL_Driver
+        )
+# Only when cross-compiling, i.e. for hardware build
+target_link_options(${TN_HAL} PRIVATE
+        -T../src/STM32F446RETx_FLASH.ld
+        -specs=nosys.specs
+        -mcpu=cortex-m4
+        -mthumb
+        -mfpu=fpv4-sp-d16
+        -mfloat-abi=hard
+        -Wl,-Map=${PROJECT_NAME}.map,--cref
+        -Wl,--gc-sections
+        )
 
 
 # Create gitInfo.h among other things as part of the cross-compile pre-build step.
