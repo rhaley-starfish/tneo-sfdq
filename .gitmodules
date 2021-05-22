@@ -1,0 +1,6 @@
+[submodule "tneo"]
+	path = tneo
+	url = https://github.com/dimonomid/tneo.git
+[submodule "sfdq_firmware"]
+	path = sfdq_firmware
+	url = https://git.code.sf.net/p/starfishdaq/firmware
