@@ -1,0 +1,73 @@
+### This is a standard git config for the cev_desktop_jig project but can be used in general with git.
+### To use this as your STANDARD .config file:
+### 1) Change the name and email in the [user] section below.
+### 2) cd into this directory (cev_desktop_jig/extra) and run
+###	mv README_gitconfig ~/.gitconfig. 
+
+[color]
+	branch = auto
+	diff = auto
+	status = auto
+	ui = true
+[user]
+	name =	rhaley-starfish
+	email = rhaley@starfishmedical.com
+[diff]
+    tool = meld
+[difftool]
+    prompt = false
+[difftool "meld"]
+    cmd = meld $LOCAL $REMOTE
+[merge]
+	tool = meld
+	#conflictstyle = diff3
+[mergetool "meld"]
+	cmd = meld $LOCAL $MERGED $REMOTE
+#	cmd = meld $LOCAL $BASE $REMOTE --auto-merge
+[alias]
+	#git st - shorter version of git status
+	st = status -sb
+	ci = commit
+	br = branch
+	co = checkout
+	df = diff
+	#
+	#git ignored - see a list of all files being ignored
+	ignored = ls-files --others -i --exclude-standard
+	#
+	#git lol - graph of current branch
+	lol = log --graph --decorate --pretty=oneline --abbrev-commit
+	#
+	#git la - graph of all branches
+	la = log --graph --decorate --pretty=oneline --abbrev-commit --all
+	#
+	#git lg - simple git log
+	lg = log --pretty=format:'%Cred%h%Creset -%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+	#
+	#git purr - Fetch changes from remote and then rebase instead of default merge.
+	purr = pull --rebase
+	#
+	#git ready - allows you to clean up and squash comments (pick --> s) and fix errors (pick --> r)
+	ready = rebase -i @{u}
+	#
+	#git standup - Quick view of what you did yesterday.
+	standup = !git log --since yesterday --author `git config user.email` --pretty=short
+	#
+	#git dangle - Show all dangling commits from tips of commit trees with no reference pointing to them.
+	dangle = !git log --all --graph --oneline --decorate $( git fsck --no-reflog | awk '/dangling commit/ {print $3}' )
+	wipdangle = !git fsck --unreachable | grep commit | cut -d' ' -f3 | xargs git log --merges --no-walk --grep=WIP
+	
+	last = log -1 HEAD --pretty=oneline
+	visual = !gitk
+[push]
+#	default = simple
+	default = current
+[pull]
+	rebase = true
+[core]
+	editor = nvim
+	autocrlf = input 
+[branch]
+	autosetuprebase = always
+[credential]
+	helper = manager
