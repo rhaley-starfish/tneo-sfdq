@@ -13,6 +13,10 @@ add_executable(${PROJECT_NAME}
         buddymem/emm.c
         fft-c/libfft/fft.c
         src/task_consumer.c
+        src/task_producer.c
+        src/slowcode.c
+        src/fastcode-tneo-wrapper.c
+        src/slowcode-tneo-wrapper.c
         src/system_stm32f4xx.c
         src/startup_stm32f446xx.s
         )
